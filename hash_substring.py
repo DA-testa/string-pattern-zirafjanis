@@ -42,3 +42,7 @@ def get_occurrences(pattern, text):
             h_text = h_text - ord(text[i]) * power_p[m-1]
             h_text = h_text * p + ord(text[i+m])
     return matches
+
+# Launch the functions
+if __name__ == '__main__':
+    print_occurrences(get_occurrences(*read_input()))
