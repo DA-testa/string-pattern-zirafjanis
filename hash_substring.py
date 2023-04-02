@@ -1,52 +1,48 @@
-# python3
-
 def read_input():
-    # read the input type (keyboard or file)
-    input_type = input().rstrip()
-
+    # Choose the input type: keyboard or file
+    input_type = input().rstrip().lower()
     if input_type == 'i':
-        # read two lines from keyboard input
+        # Read input from keyboard
         pattern = input().rstrip()
         text = input().rstrip()
-    elif input_type == 'f':
-        # read two lines from input file
+    else:
+        # Read input from file
         with open(input().rstrip()) as f:
             pattern = f.readline().rstrip()
             text = f.readline().rstrip()
-    else:
-        # input type not recognized
-        raise ValueError('Input type not recognized')
-
-    # return both lines as a tuple
     return pattern, text
 
 def print_occurrences(output):
-    # print the occurrences in ascending order
-    print(' '.join(map(str, sorted(output))))
-
+    # Print the occurrences in ascending order
+    print(' '.join(map(str, output)))
 
 def get_occurrences(pattern, text):
-    # Rabin-Karp algorithm to find occurrences of pattern in text
-    occurrences = []
-    p_len = len(pattern)
-    t_len = len(text)
-    if p_len > t_len:
-        return occurrences
+    n = len(text)
+    m = len(pattern)
+    p = 31  # A prime number used for hash calculation
+    h_pattern = 0
+    h_text = 0
+    power_p = [1]
+    matches = []
+    # Precompute the powers of p
+    for i in range(1, max(n, m)):
+        power_p.append(power_p[-1] * p)
+    # Calculate the hash value of the pattern and the initial substring of the text
+    for i in range(m):
+        h_pattern = h_pattern * p + ord(pattern[i])
+        h_text = h_text * p + ord(text[i])
+    # Compare the hash values of the pattern and the initial substring of the text
+    for i in range(n - m + 1):
+        if h_pattern == h_text:
+            # Compare the characters of the pattern and the substring of the text
+            if pattern == text[i:i+m]:
+                matches.append(i)
+        if i < n - m:
+            # Calculate the hash value of the next substring of the text
+            h_text = h_text - ord(text[i]) * power_p[m-1]
+            h_text = h_text * p + ord(text[i+m])
+    return matches
 
-    # Calculate the hash value of pattern and first window of text
-    p_hash = hash(pattern)
-    t_hash = hash(text[0:p_len])
-    if p_hash == t_hash and pattern == text[0:p_len]:
-        occurrences.append(0)
-
-    # Calculate the hash value of each subsequent window of text
-    for i in range(1, t_len - p_len + 1):
-        t_hash = hash(text[i:i+p_len])
-        if p_hash == t_hash and pattern == text[i:i+p_len]:
-            occurrences.append(i)
-
-    return occurrences
-
-
+# Launch the functions
 if __name__ == '__main__':
     print_occurrences(get_occurrences(*read_input()))
